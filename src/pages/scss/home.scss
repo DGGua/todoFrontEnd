@@ -1,0 +1,20 @@
+.page-main {
+  .todolist {
+    margin-top: 2rem;
+    width: 100%;
+    .title {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      font-size: x-large;
+      .icons {
+        display: flex;
+        column-gap: 0.5em;
+      }
+    }
+    .content {
+      margin-top: 1rem;
+    }
+  }
+}

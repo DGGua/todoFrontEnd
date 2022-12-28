@@ -1,0 +1,11 @@
+.page-user {
+  .user-info {
+    display: flex;
+    align-items: center;
+    .user-name {
+      margin-left: 1em;
+      font-size: large;
+      font-weight: 1000;
+    }
+  }
+}

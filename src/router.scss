@@ -1,0 +1,22 @@
+.tabbar-app {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tabbar-top {
+    flex: 0;
+    border-bottom: solid 1px var(--adm-color-border);
+  }
+  
+  .tabbar-body {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    // align-items: center;
+  }
+  
+  .tabbar-bottom {
+    flex: 0;
+    border-top: solid 1px var(--adm-color-border);
+  }
