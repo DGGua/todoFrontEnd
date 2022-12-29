@@ -1,14 +1,15 @@
-import { DatePicker, Button } from "antd-mobile";
+import { DatePicker, Button, Modal } from "antd-mobile";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
-import { List } from "antd";
+import { Form, List, Input } from "antd-mobile";
 import { useState } from "react";
 import * as dayjs from "dayjs";
 import "../scss/home.scss";
+import { EditItem } from "../../components/tsx/editItem";
 
 const data = [
   "Racing car sprays burning fuel into crowd.",
@@ -18,9 +19,17 @@ const data = [
   "Los Angeles battles huge wildfires.",
 ];
 
+interface Item {}
+
 export default function Home() {
   const [pickerVisible, setPickerVisible] = useState(false);
   const [date, setdate] = useState(dayjs.default());
+  const [modalVisible, setModalVisible] = useState(true);
+  const [chosenItem, setChosenItem] = useState<Item>();
+  function showAdd() {
+    setModalVisible(true);
+  }
+
   return (
     <div className="page page-main">
       <Button onClick={() => setPickerVisible(true)}>
@@ -38,21 +47,32 @@ export default function Home() {
         <div className="title">
           <div>待办事件表</div>
           <div className="icons">
-            <PlusOutlined />
+            <PlusOutlined onClick={showAdd} />
             <EditOutlined />
             <DeleteOutlined />
           </div>
         </div>
-        <List
-          className="content"
-          size="small"
-          header={<div>Header</div>}
-          footer={<div>Footer</div>}
-          bordered
-          dataSource={data}
-          renderItem={(item) => <List.Item>{item}</List.Item>}
-        />
+        <List className="content">
+          {data.map((item) => (
+            <List.Item>{item}</List.Item>
+          ))}
+        </List>
       </div>
+      <Modal
+        visible={modalVisible}
+        content={
+          <EditItem
+            onConfirm={() => {
+              alert("还没实现");
+              setModalVisible(false);
+            }}
+            onCancel={() => {
+              alert("还没实现");
+              setModalVisible(false);
+            }}
+          />
+        }
+      />
     </div>
   );
 }

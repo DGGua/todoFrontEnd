@@ -7,16 +7,18 @@ import "dayjs/locale/zh-cn";
 import zhCN from "antd/locale/zh_CN";
 import { ConfigProvider } from "antd";
 import TabbarRouter from "./router";
+import { BrowserRouter } from "react-router-dom";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
-
 root.render(
   <React.StrictMode>
     <ConfigProvider locale={zhCN}>
-      <TabbarRouter />
+      <BrowserRouter>
+        <TabbarRouter />
+      </BrowserRouter>
     </ConfigProvider>
   </React.StrictMode>
 );
