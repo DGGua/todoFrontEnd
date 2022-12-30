@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input } from "antd-mobile";
+import { Button, Form, Input } from "antd-mobile";
 import { Link } from "react-router-dom";
 
 export default function Register() {

@@ -3,9 +3,9 @@ import { NavBar, TabBar } from "antd-mobile";
 import {
   Route,
   useLocation,
-  MemoryRouter as Router,
   Routes,
   useNavigate,
+  Navigate,
 } from "react-router-dom";
 import {
   MessageOutline,
@@ -18,6 +18,7 @@ import Data from "./pages/tsx/data";
 import User from "./pages/tsx/user";
 import Login from "./pages/tsx/login";
 import Register from "./pages/tsx/register";
+import Edit from "./pages/tsx/edit";
 
 const tabs = [
   {
@@ -87,9 +88,11 @@ export default function TabbarRouter() {
         <Routes>
           <Route path="/home" element={<Home />}></Route>
           <Route path="/data" element={<Data />}></Route>
+          <Route path="/edit" element={<Edit />}></Route>
           <Route path="/me" element={<User />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<Register />}></Route>
+          <Route path="*" element={<Navigate to={"/home"} />} />
         </Routes>
       </div>
       <div
