@@ -5,10 +5,11 @@ import {
   DeleteOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
-import { List } from "antd";
+import { List } from "antd-mobile";
 import { useState } from "react";
 import * as dayjs from "dayjs";
 import "../scss/home.scss";
+import { useNavigate } from "react-router-dom";
 
 const data = [
   "Racing car sprays burning fuel into crowd.",
@@ -18,9 +19,21 @@ const data = [
   "Los Angeles battles huge wildfires.",
 ];
 
+interface Item {}
+
 export default function Home() {
   const [pickerVisible, setPickerVisible] = useState(false);
   const [date, setdate] = useState(dayjs.default());
+  const [chosenItem, setChosenItem] = useState<Item>();
+  const navigate = useNavigate();
+  function goEdit() {
+    if (!!!chosenItem) return;
+    navigate("/edit", { state: { item: chosenItem } });
+  }
+  function goAdd() {
+    navigate("/edit", { state: { item: chosenItem } });
+  }
+
   return (
     <div className="page page-main">
       <Button onClick={() => setPickerVisible(true)}>
@@ -38,20 +51,16 @@ export default function Home() {
         <div className="title">
           <div>待办事件表</div>
           <div className="icons">
-            <PlusOutlined />
-            <EditOutlined />
+            <PlusOutlined onClick={goAdd} />
+            <EditOutlined onClick={goEdit} />
             <DeleteOutlined />
           </div>
         </div>
-        <List
-          className="content"
-          size="small"
-          header={<div>Header</div>}
-          footer={<div>Footer</div>}
-          bordered
-          dataSource={data}
-          renderItem={(item) => <List.Item>{item}</List.Item>}
-        />
+        <List className="content">
+          {data.map((item) => (
+            <List.Item onClick={() => setChosenItem(item)}>{item}</List.Item>
+          ))}
+        </List>
       </div>
     </div>
   );
