@@ -92,7 +92,7 @@ export default function TabbarRouter() {
           <Route path="/me" element={<User />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<Register />}></Route>
-          <Route path="*" element={<Navigate to={"/home"} />} />
+          <Route path="*" element={<Navigate to={"/login"} />} />
         </Routes>
       </div>
       <div

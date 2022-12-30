@@ -1,0 +1,29 @@
+.page-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .panel-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 2px solid var(--adm-border-color);
+    border-radius: var(--adm-radius-m);
+    margin: 1rem;
+    h1 {
+      margin-top: 1rem;
+    }
+    .link-to-register {
+      width: 100%;
+      text-align: end;
+      display: block;
+      margin-top: 1em;
+    }
+  }
+
+  .about {
+    position: absolute;
+    bottom: 1rem;
+  }
+}
