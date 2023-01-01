@@ -76,7 +76,7 @@ export default function Edit() {
         </Form.Item>
         {values.category === "group" ? (
           <Form.Array
-            name="contacts"
+            name="subs"
             onAdd={(operation) => operation.add({ listitem: "" })}
             renderAdd={() => (
               <span>
@@ -123,7 +123,7 @@ export default function Edit() {
         </Form.Item>
         <Form.Item
           label="起始时间"
-          name="endtime"
+          name="starttime"
           hidden={values.timecategory !== "normalclock"}
           trigger="onConfirm"
           onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {

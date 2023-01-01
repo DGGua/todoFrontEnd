@@ -6,26 +6,29 @@ import {
   CalendarOutlined,
 } from "@ant-design/icons";
 import { List } from "antd-mobile";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as dayjs from "dayjs";
 import "../scss/home.scss";
 import { useNavigate } from "react-router-dom";
-
-const data = [
-  "Racing car sprays burning fuel into crowd.",
-  "Japanese princess to wed commoner.",
-  "Australian walks 100km after outback crash.",
-  "Man charged over missing wedding girl.",
-  "Los Angeles battles huge wildfires.",
-];
-
-interface Item {}
+import { Item } from "../../model/item";
+import { itemService } from "../../service/itemService";
 
 export default function Home() {
   const [pickerVisible, setPickerVisible] = useState(false);
   const [date, setdate] = useState(dayjs.default());
   const [chosenItem, setChosenItem] = useState<Item>();
+  const [itemList, setItemList] = useState<Item[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    itemService
+      .list(date.format("YYYYMMDD"))
+      .then((res) => setItemList(res.data.data));
+  }, [date]);
+  useEffect(() => {
+    console.log(itemList);
+  }, [itemList]);
+
   function goEdit() {
     if (!!!chosenItem) return;
     navigate("/edit", { state: { item: chosenItem } });
@@ -57,8 +60,19 @@ export default function Home() {
           </div>
         </div>
         <List className="content">
-          {data.map((item) => (
-            <List.Item onClick={() => setChosenItem(item)}>{item}</List.Item>
+          {itemList.map((item) => (
+            <>
+              <List.Item key={item.id} onClick={() => setChosenItem(item)}>
+                {item.name}
+              </List.Item>
+              {item.category === "group"
+                ? item.subs.map((sub, index) => (
+                    <List.Item key={index} className="item-sub">
+                      {sub}
+                    </List.Item>
+                  ))
+                : null}
+            </>
           ))}
         </List>
       </div>
