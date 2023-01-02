@@ -17,9 +17,10 @@ import {
 } from "antd-mobile-icons";
 import dayjs from "dayjs";
 import { RefObject, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import {itemService} from "../../service/itemService";
 
-interface Item {}
+import { Item } from "../../model/item";
 
 const itemTypes = [
   {
@@ -37,7 +38,19 @@ export default function Edit() {
   const [clockType, setClockType] = useState("backclock");
   const [values, setValues] = useState<any>({});
   const item: Item = state.item;
+  const navigate = useNavigate();
 
+  function handleEdit(){
+    // useEffect(() => {
+    alert(item.id+item.category+item.name+item.timecategory+item.detail);
+    const updateItem: Item = {name:values.name,detail:values.detail,category:values.category,
+    subs:values.subs,timecategory:values.timecategory,id:values.id};
+      itemService
+          .update(updateItem)
+          .then((res)=>
+              alert(res.data.data))
+    // },[values])
+  }
   useEffect(() => {
     console.log(values);
   }, [values]);
@@ -51,10 +64,10 @@ export default function Edit() {
         onValuesChange={(_, values) => setValues(values)}
         footer={
           <div className="form-footer">
-            <Button color="primary" size="large">
+            <Button color="primary" size="large" onClick={() => handleEdit()}>
               确认
             </Button>
-            <Button color="default" size="large" onClick={() => {}}>
+            <Button color="default" size="large" onClick={() => navigate(-1)}>
               取消
             </Button>
           </div>
@@ -62,7 +75,7 @@ export default function Edit() {
       >
         <Form.Item
           label="待办名称"
-          name="content"
+          name="name"
           rules={[{ required: true, message: "名称不能为空" }]}
         >
           <Input placeholder="请输入" />

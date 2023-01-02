@@ -7,8 +7,8 @@ export const itemService = {
     localAxios.get<ResTemp<Item[]>>("/todo/list", { params: { date } }),
   get: (id: number) =>
     localAxios.get<ResTemp<Item>>("/todo/get", { params: { id } }),
-  update: (id: number) =>
-    localAxios.get<ResTemp<Item>>("/todo/update", { params: { id } }),
+  update: (item: Item) =>
+    localAxios.post<ResTemp<Item>>("/todo/update", { params: { item } }),
   delete: (id: number) =>
     localAxios.delete<ResTemp>("/todo/delete", { params: { id } }),
   complete: (id: number) =>
