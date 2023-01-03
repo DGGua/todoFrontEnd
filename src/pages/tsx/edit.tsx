@@ -19,9 +19,11 @@ import {
 import dayjs from "dayjs";
 import { RefObject, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { itemService } from "../../service/itemService";
-import { defaultRawItem, Item, RawItem } from "../../model/item";
+import { } from "../../model/item";
 import "../scss/edit.scss";
+import {itemService} from "../../service/itemService";
+import { Item, NormalClock, BackClock,  defaultRawItem,  RawItem} from "../../model/item";
+
 const itemTypes = [
   {
     label: "待办",
@@ -51,7 +53,8 @@ export default function Edit() {
         alert("internal error: editing item without id");
       }
     }
-  }
+  const [updateItem, setUpdateItem] = useState(item);
+
   useEffect(() => {
     console.log(item);
   }, [item]); 

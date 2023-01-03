@@ -1,9 +1,19 @@
 import { Button, Form, Input, Modal } from "antd-mobile";
 import { Link } from "react-router-dom";
 import "../scss/login.scss";
+import {userService} from "../../service/userService";
 export default function Login() {
   function handleLogin(id: string, password: string) {
-    alert("还没实现");
+    userService.login(id,password)
+        .then(response =>{
+          //成功
+          if(response.data.msg === "200"){
+
+          }
+          else {
+
+          }
+        })
   }
   return (
     <div className="page page-login">
