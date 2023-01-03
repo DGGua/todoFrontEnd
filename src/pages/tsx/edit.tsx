@@ -17,9 +17,9 @@ import {
 } from "antd-mobile-icons";
 import dayjs from "dayjs";
 import { RefObject, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-
-interface Item {}
+import { useLocation, useNavigate } from "react-router-dom";
+import {itemService} from "../../service/itemService";
+import { Item } from "../../model/item";
 
 const itemTypes = [
   {
@@ -37,7 +37,27 @@ export default function Edit() {
   const [clockType, setClockType] = useState("backclock");
   const [values, setValues] = useState<any>({});
   const item: Item = state.item;
+  const navigate = useNavigate();
+  var updateItem: Item;
 
+  function handleEdit(updateItem: Item){
+    alert(item.id+item.category+item.name+item.timecategory+item.detail);
+    if(values.category === null){
+      updateItem.category = "single";
+    }
+    // else {
+    //   updateItem.subs
+    // }
+    if(values.timecategory === null){
+      updateItem.timecategory = "backclock";
+    }
+    updateItem.name = values.name;
+    updateItem.detail = values.detail;
+    // if(updateItem.)
+    itemService
+        .update(updateItem)
+        .then((res)=> alert(res.data.data))
+  }
   useEffect(() => {
     console.log(values);
   }, [values]);
@@ -51,10 +71,11 @@ export default function Edit() {
         onValuesChange={(_, values) => setValues(values)}
         footer={
           <div className="form-footer">
-            <Button color="primary" size="large">
+            <Button color="primary" size="large" onClick={() => handleEdit(
+                updateItem)}>
               确认
             </Button>
-            <Button color="default" size="large" onClick={() => {}}>
+            <Button color="default" size="large" onClick={() => navigate(-1)}>
               取消
             </Button>
           </div>
@@ -62,7 +83,7 @@ export default function Edit() {
       >
         <Form.Item
           label="待办名称"
-          name="content"
+          name="name"
           rules={[{ required: true, message: "名称不能为空" }]}
         >
           <Input placeholder="请输入" />
