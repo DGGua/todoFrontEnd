@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { NavBar, TabBar } from "antd-mobile";
 import {
   Route,
@@ -53,7 +53,6 @@ const routeInfo: Record<string, RouteInfo> = {
   "/login": { element: <Login />, title: "登录" },
   "/register": { element: <Register />, title: "注册" },
 };
-const tabkeys = tabs.map((item) => item.key);
 
 const Bottom = () => {
   const location = useLocation();

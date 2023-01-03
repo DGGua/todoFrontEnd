@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export type RawItem = {
   name: string;
   detail?: string;
@@ -28,3 +30,10 @@ export interface ResTemp<T = never> {
   data: T;
   msg: string;
 }
+
+export const defaultRawItem: RawItem = {
+  category: "single",
+  timecategory: "backclock",
+  endtime: dayjs().add(1, "hour").toString(),
+  name: "",
+};

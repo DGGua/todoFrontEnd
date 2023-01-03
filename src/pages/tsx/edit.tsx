@@ -20,7 +20,7 @@ import dayjs from "dayjs";
 import { RefObject, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { itemService } from "../../service/itemService";
-import { Item } from "../../model/item";
+import { defaultRawItem, Item, RawItem } from "../../model/item";
 import "../scss/edit.scss";
 const itemTypes = [
   {
@@ -36,48 +36,36 @@ const itemTypes = [
 export default function Edit() {
   const { state } = useLocation();
   const [clockType, setClockType] = useState("backclock");
-  const [values, setValues] = useState<any>({});
-  const item: Item = state.item;
+  const [item, setItem] = useState<Item | RawItem>(
+    state.item === undefined ? defaultRawItem : (state.item as Item)
+  );
+  const mode = state.item === undefined ? "create" : "edit";
   const navigate = useNavigate();
-  var updateItem: Item;
 
-  function handleEdit(updateItem: Item) {
-    alert(
-      item.id + item.category + item.name + item.timecategory + item.detail
-    );
-    if (values.category === null) {
-      updateItem.category = "single";
+  function handleSubmit() {
+    if (mode === "create") itemService.create(item);
+    else if (mode === "edit") {
+      if ("id" in item) {
+        itemService.update(item).then((res) => alert(res.data.data));
+      } else {
+        alert("internal error: editing item without id");
+      }
     }
-    // else {
-    //   updateItem.subs
-    // }
-    if (values.timecategory === null) {
-      updateItem.timecategory = "backclock";
-    }
-    updateItem.name = values.name;
-    updateItem.detail = values.detail;
-    // if(updateItem.)
-    itemService.update(updateItem).then((res) => alert(res.data.data));
   }
   useEffect(() => {
-    console.log(values);
-  }, [values]);
-
+    console.log(item);
+  }, [item]); 
   return (
     <div className="page editpage">
       {item ? "编辑待办" : "添加待办"}
       <Form
-        initialValues={values}
+        initialValues={item}
         layout="horizontal"
-        onValuesChange={(_, values) => setValues(values)}
+        onValuesChange={(_, values) => setItem(values)}
+        onFinish={handleSubmit}
         footer={
           <div className="form-footer">
-            <Button
-              color="primary"
-              size="large"
-              block
-              onClick={() => handleEdit(updateItem)}
-            >
+            <Button type="submit" color="primary" size="large" block>
               确认
             </Button>
             <Button
@@ -107,7 +95,7 @@ export default function Edit() {
             </Space>
           </Radio.Group>
         </Form.Item>
-        {values.category === "group" ? (
+        {item.category === "group" ? (
           <Form.Array
             name="subs"
             onAdd={(operation) => operation.add({ listitem: "" })}
@@ -157,7 +145,7 @@ export default function Edit() {
         <Form.Item
           label="起始时间"
           name="starttime"
-          hidden={values.timecategory !== "normalclock"}
+          hidden={item.timecategory !== "normalclock"}
           trigger="onConfirm"
           onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
             datePickerRef.current?.open();
@@ -170,9 +158,9 @@ export default function Edit() {
           </DatePicker>
         </Form.Item>
         <Form.Item
-          label={values.timecategory === "backclock" ? "截止时间" : "结束时间"}
+          label={item.timecategory === "backclock" ? "截止时间" : "结束时间"}
           name="endtime"
-          hidden={values.timecategory === "noclock"}
+          hidden={item.timecategory === "noclock"}
           trigger="onConfirm"
           onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
             datePickerRef.current?.open();
