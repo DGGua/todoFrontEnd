@@ -8,7 +8,7 @@ export const itemService = {
   get: (id: number) =>
     localAxios.get<ResTemp<Item>>("/todo/get", { params: { id } }),
   update: (item: Item) =>
-    localAxios.post<ResTemp<Item>>("/todo/update", { params: { item } }),
+    localAxios.post<ResTemp<Item>>("/todo/update",  { item } ),
   delete: (id: number) =>
     localAxios.delete<ResTemp>("/todo/delete", { params: { id } }),
   complete: (id: number) =>

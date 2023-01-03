@@ -19,7 +19,6 @@ import dayjs from "dayjs";
 import { RefObject, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {itemService} from "../../service/itemService";
-
 import { Item } from "../../model/item";
 
 const itemTypes = [
@@ -39,17 +38,25 @@ export default function Edit() {
   const [values, setValues] = useState<any>({});
   const item: Item = state.item;
   const navigate = useNavigate();
+  var updateItem: Item;
 
-  function handleEdit(){
-    // useEffect(() => {
+  function handleEdit(updateItem: Item){
     alert(item.id+item.category+item.name+item.timecategory+item.detail);
-    const updateItem: Item = {name:values.name,detail:values.detail,category:values.category,
-    subs:values.subs,timecategory:values.timecategory,id:values.id};
-      itemService
-          .update(updateItem)
-          .then((res)=>
-              alert(res.data.data))
-    // },[values])
+    if(values.category === null){
+      updateItem.category = "single";
+    }
+    // else {
+    //   updateItem.subs
+    // }
+    if(values.timecategory === null){
+      updateItem.timecategory = "backclock";
+    }
+    updateItem.name = values.name;
+    updateItem.detail = values.detail;
+    // if(updateItem.)
+    itemService
+        .update(updateItem)
+        .then((res)=> alert(res.data.data))
   }
   useEffect(() => {
     console.log(values);
@@ -64,7 +71,8 @@ export default function Edit() {
         onValuesChange={(_, values) => setValues(values)}
         footer={
           <div className="form-footer">
-            <Button color="primary" size="large" onClick={() => handleEdit()}>
+            <Button color="primary" size="large" onClick={() => handleEdit(
+                updateItem)}>
               确认
             </Button>
             <Button color="default" size="large" onClick={() => navigate(-1)}>

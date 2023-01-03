@@ -1,4 +1,4 @@
-import { DatePicker, Button } from "antd-mobile";
+import { DatePicker, Button, Dialog } from "antd-mobile";
 import {
   PlusOutlined,
   EditOutlined,
@@ -19,6 +19,7 @@ export default function Home() {
   const [chosenItem, setChosenItem] = useState<Item>();
   const [itemList, setItemList] = useState<Item[]>([]);
   const navigate = useNavigate();
+  var empty: Item;
 
   useEffect(() => {
     itemService
@@ -30,11 +31,32 @@ export default function Home() {
   }, [itemList]);
 
   function goEdit() {
-    if (!!!chosenItem) return;
+    if (!chosenItem) return;
     navigate("/edit", { state: { item: chosenItem } });
   }
   function goAdd() {
     navigate("/edit", { state: { item: chosenItem } });
+  }
+  function goDelete(){
+    if (!chosenItem){
+      Dialog.alert({
+        content: '请选择需要删除的项目！',
+        onConfirm: () => {
+          console.log('Confirmed')
+        }
+      })
+      return;
+    }
+    Dialog.confirm({
+      content: '确认要删除吗？',
+      onConfirm:()=>{
+        itemService.delete(chosenItem.id);
+        itemService
+            .list(date.format("YYYYMMDD"))
+            .then((res) => setItemList(res.data.data));
+        setChosenItem(empty);
+      }
+    })
   }
 
   return (
@@ -56,7 +78,7 @@ export default function Home() {
           <div className="icons">
             <PlusOutlined onClick={goAdd} />
             <EditOutlined onClick={goEdit} />
-            <DeleteOutlined />
+            <DeleteOutlined onClick={goDelete}/>
           </div>
         </div>
         <List className="content">
