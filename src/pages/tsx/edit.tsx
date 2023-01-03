@@ -19,7 +19,7 @@ import dayjs from "dayjs";
 import { RefObject, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {itemService} from "../../service/itemService";
-import { Item } from "../../model/item";
+import { Item, NormalClock, BackClock} from "../../model/item";
 
 const itemTypes = [
   {
@@ -38,22 +38,31 @@ export default function Edit() {
   const [values, setValues] = useState<any>({});
   const item: Item = state.item;
   const navigate = useNavigate();
-  var updateItem: Item;
+  const [updateItem, setUpdateItem] = useState(item);
 
-  function handleEdit(updateItem: Item){
-    alert(item.id+item.category+item.name+item.timecategory+item.detail);
-    if(values.category === null){
-      updateItem.category = "single";
+  function handleEdit(){
+    //保证默认值也能存入updateItem
+    if(values.category === undefined){
+      item.category = "single";
     }
-    // else {
-    //   updateItem.subs
-    // }
-    if(values.timecategory === null){
-      updateItem.timecategory = "backclock";
+    if(values.timecategory === undefined){
+      if(item.timecategory === "normalclock"){
+        item.starttime = "";
+      }
+      if(item.timecategory === "normalclock" ||
+          item.timecategory === "backclock"){
+        item.endtime = "";
+      }
+      else {
+        item
+      }
+      //这一块问题最大
+      // item.endtime = values.endtime;
+      item.timecategory = "backclock";
     }
-    updateItem.name = values.name;
-    updateItem.detail = values.detail;
-    // if(updateItem.)
+    item.name = values.name;
+    item.detail = values.detail;
+    setUpdateItem(item);
     itemService
         .update(updateItem)
         .then((res)=> alert(res.data.data))
@@ -71,8 +80,7 @@ export default function Edit() {
         onValuesChange={(_, values) => setValues(values)}
         footer={
           <div className="form-footer">
-            <Button color="primary" size="large" onClick={() => handleEdit(
-                updateItem)}>
+            <Button color="primary" size="large" onClick={() => handleEdit()}>
               确认
             </Button>
             <Button color="default" size="large" onClick={() => navigate(-1)}>

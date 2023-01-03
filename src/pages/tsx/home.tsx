@@ -31,7 +31,15 @@ export default function Home() {
   }, [itemList]);
 
   function goEdit() {
-    if (!chosenItem) return;
+    if (!chosenItem) {
+      Dialog.alert({
+        content: '请选择需要修改的项目！',
+        onConfirm: () => {
+          console.log('Confirmed')
+        }
+      })
+      return;
+    }
     navigate("/edit", { state: { item: chosenItem } });
   }
   function goAdd() {

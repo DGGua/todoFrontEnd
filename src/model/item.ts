@@ -15,8 +15,8 @@ interface SingleItem {
   category: "single";
 }
 
-type BackClock = { timecategory: "backclock"; endtime: string };
-type NormalClock = {
+export type BackClock = { timecategory: "backclock"; endtime: string };
+export type NormalClock = {
   timecategory: "normalclock";
   endtime: string;
   starttime: string;
