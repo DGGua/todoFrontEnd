@@ -6,6 +6,7 @@ import {
   Input,
   JumboTabs,
   Radio,
+  Space,
   TextArea,
 } from "antd-mobile";
 import {
@@ -18,9 +19,9 @@ import {
 import dayjs from "dayjs";
 import { RefObject, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {itemService} from "../../service/itemService";
+import { itemService } from "../../service/itemService";
 import { Item } from "../../model/item";
-
+import "../scss/edit.scss";
 const itemTypes = [
   {
     label: "待办",
@@ -40,23 +41,23 @@ export default function Edit() {
   const navigate = useNavigate();
   var updateItem: Item;
 
-  function handleEdit(updateItem: Item){
-    alert(item.id+item.category+item.name+item.timecategory+item.detail);
-    if(values.category === null){
+  function handleEdit(updateItem: Item) {
+    alert(
+      item.id + item.category + item.name + item.timecategory + item.detail
+    );
+    if (values.category === null) {
       updateItem.category = "single";
     }
     // else {
     //   updateItem.subs
     // }
-    if(values.timecategory === null){
+    if (values.timecategory === null) {
       updateItem.timecategory = "backclock";
     }
     updateItem.name = values.name;
     updateItem.detail = values.detail;
     // if(updateItem.)
-    itemService
-        .update(updateItem)
-        .then((res)=> alert(res.data.data))
+    itemService.update(updateItem).then((res) => alert(res.data.data));
   }
   useEffect(() => {
     console.log(values);
@@ -71,11 +72,20 @@ export default function Edit() {
         onValuesChange={(_, values) => setValues(values)}
         footer={
           <div className="form-footer">
-            <Button color="primary" size="large" onClick={() => handleEdit(
-                updateItem)}>
+            <Button
+              color="primary"
+              size="large"
+              block
+              onClick={() => handleEdit(updateItem)}
+            >
               确认
             </Button>
-            <Button color="default" size="large" onClick={() => navigate(-1)}>
+            <Button
+              color="default"
+              size="large"
+              block
+              onClick={() => navigate(-1)}
+            >
               取消
             </Button>
           </div>
@@ -90,9 +100,11 @@ export default function Edit() {
         </Form.Item>
         <Form.Item label="待办类型" name="category" required>
           <Radio.Group defaultValue="single">
-            {itemTypes.map((item) => (
-              <Radio value={item.value}>{item.label}</Radio>
-            ))}
+            <Space>
+              {itemTypes.map((item) => (
+                <Radio value={item.value}>{item.label}</Radio>
+              ))}
+            </Space>
           </Radio.Group>
         </Form.Item>
         {values.category === "group" ? (

@@ -37,6 +37,22 @@ const tabs = [
     icon: <UserOutline />,
   },
 ];
+
+interface RouteInfo {
+  element: JSX.Element;
+  title?: string;
+  bar?: boolean;
+  backward?: boolean;
+}
+
+const routeInfo: Record<string, RouteInfo> = {
+  "/home": { element: <Home />, title: "待办", bar: true },
+  "/data": { element: <Data />, title: "用户信息", bar: true },
+  "/edit": { element: <Edit />, title: "编辑", backward: true },
+  "/me": { element: <User />, title: "我的", bar: true },
+  "/login": { element: <Login />, title: "登录" },
+  "/register": { element: <Register />, title: "注册" },
+};
 const tabkeys = tabs.map((item) => item.key);
 
 const Bottom = () => {
@@ -57,15 +73,8 @@ const Bottom = () => {
 };
 
 export default function TabbarRouter() {
-  const [showTab, setShowTab] = useState(false);
-  const location = useLocation();
-  useEffect(() => {
-    setShowTab(
-      tabkeys
-        .map((s) => location.pathname.startsWith(s))
-        .reduce((prev, now) => prev || now)
-    );
-  }, [location]);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   // 夜间模式
   useEffect(() => {
     if (localStorage.getItem("darkmode") != null) {
@@ -80,24 +89,26 @@ export default function TabbarRouter() {
     <div className="tabbar-app">
       <div
         className="tabbar-top"
-        style={{ display: showTab ? "block" : "none" }}
+        style={{ display: routeInfo[pathname].title ? "block" : "none" }}
       >
-        <NavBar>你好</NavBar>
+        <NavBar
+          back={routeInfo[pathname].backward ? "" : null}
+          onBack={() => navigate(-1)}
+        >
+          {routeInfo[pathname].title}
+        </NavBar>
       </div>
       <div className={"tabbar-body"}>
         <Routes>
-          <Route path="/home" element={<Home />}></Route>
-          <Route path="/data" element={<Data />}></Route>
-          <Route path="/edit" element={<Edit />}></Route>
-          <Route path="/me" element={<User />}></Route>
-          <Route path="/login" element={<Login />}></Route>
-          <Route path="/register" element={<Register />}></Route>
-          <Route path="*" element={<Navigate to={"/login"} />} />
+          {Object.keys(routeInfo).map((key) => (
+            <Route path={key} element={routeInfo[key].element} />
+          ))}
+          <Route path="*" element={<Navigate to={"/home"} />} />
         </Routes>
       </div>
       <div
         className={"tabbar-bottom"}
-        style={{ display: showTab ? "block" : "none" }}
+        style={{ display: routeInfo[pathname].bar ? "block" : "none" }}
       >
         <Bottom />
       </div>
