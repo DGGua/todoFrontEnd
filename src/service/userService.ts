@@ -1,8 +1,9 @@
+import { ResTemp } from "../model/item";
 import { localAxios } from "./globalService";
 
 export const userService = {
   login: (userID: string, password: string) =>
-    localAxios.post("/user/login", { userID, password }),
+    localAxios.post<ResTemp>("/user/login", { userID, password }),
   register: (userID: string, password: string, phone: number) =>
-    localAxios.post("/user/register", { userID, password, phone }),
+    localAxios.post<ResTemp>("/user/register", { userID, password, phone }),
 };

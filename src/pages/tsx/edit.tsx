@@ -1,10 +1,12 @@
 import {
   Button,
+  Card,
   DatePicker,
   DatePickerRef,
   Form,
   Input,
   JumboTabs,
+  Modal,
   Radio,
   Space,
   TextArea,
@@ -17,12 +19,20 @@ import {
   PlayOutline,
 } from "antd-mobile-icons";
 import dayjs from "dayjs";
-import { RefObject, useEffect, useState } from "react";
+import { RefObject, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { } from "../../model/item";
 import "../scss/edit.scss";
-import {itemService} from "../../service/itemService";
-import { Item, NormalClock, BackClock,  defaultRawItem,  RawItem} from "../../model/item";
+import { itemService } from "../../service/itemService";
+import {
+  Item,
+  defaultRawItem,
+  RawItem,
+  convertItem,
+  ItemUnconverted,
+  unconvertItem,
+  ResTemp,
+} from "../../model/item";
+import { AxiosResponse } from "axios";
 
 const itemTypes = [
   {
@@ -39,32 +49,38 @@ export default function Edit() {
   const { state } = useLocation();
   const [clockType, setClockType] = useState("backclock");
   const [item, setItem] = useState<Item | RawItem>(
-    state.item === undefined ? defaultRawItem : (state.item as Item)
+    state?.item === undefined
+      ? defaultRawItem
+      : convertItem(state.item as ItemUnconverted)
   );
-  const mode = state.item === undefined ? "create" : "edit";
+  const mode = state?.item === undefined ? "新建" : "编辑";
   const navigate = useNavigate();
-
   function handleSubmit() {
-    if (mode === "create") itemService.create(item);
-    else if (mode === "edit") {
-      if ("id" in item) {
-        itemService.update(item).then((res) => alert(res.data.data));
-      } else {
-        alert("internal error: editing item without id");
-      }
+    let promise: Promise<AxiosResponse<ResTemp>>;
+    if (mode === "新建") {
+      promise = itemService.create(
+        unconvertItem({ ...item, id: dayjs().valueOf() })
+      );
+    } else {
+      promise = itemService.update(unconvertItem(item) as ItemUnconverted);
     }
-  const [updateItem, setUpdateItem] = useState(item);
-
-  useEffect(() => {
-    console.log(item);
-  }, [item]); 
+    promise.then((res) => {
+      const modal = Modal.show({ content: res.data.msg });
+      setTimeout(() => {
+        modal.close();
+        if (res.data.code === 0) navigate("/home");
+      }, 1000);
+    });
+  }
   return (
     <div className="page editpage">
-      {item ? "编辑待办" : "添加待办"}
+      <div className="title">{`${mode}待办`}</div>
       <Form
         initialValues={item}
         layout="horizontal"
-        onValuesChange={(_, values) => setItem(values)}
+        onValuesChange={(_, values) => {
+          setItem(values);
+        }}
         onFinish={handleSubmit}
         footer={
           <div className="form-footer">
@@ -92,8 +108,10 @@ export default function Edit() {
         <Form.Item label="待办类型" name="category" required>
           <Radio.Group defaultValue="single">
             <Space>
-              {itemTypes.map((item) => (
-                <Radio value={item.value}>{item.label}</Radio>
+              {itemTypes.map((item, index) => (
+                <Radio key={index} value={item.value}>
+                  {item.label}
+                </Radio>
               ))}
             </Space>
           </Radio.Group>
@@ -126,7 +144,7 @@ export default function Edit() {
             }
           </Form.Array>
         ) : null}
-        <Form.Item label="计时类型" name="timecategory">
+        <Form.Item label="计时类型" name="timecategory" required>
           <JumboTabs activeKey={clockType} onChange={setClockType}>
             <JumboTabs.Tab
               title={<ClockCircleOutline />}
@@ -145,36 +163,41 @@ export default function Edit() {
             ></JumboTabs.Tab>
           </JumboTabs>
         </Form.Item>
-        <Form.Item
-          label="起始时间"
-          name="starttime"
-          hidden={item.timecategory !== "normalclock"}
-          trigger="onConfirm"
-          onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
-            datePickerRef.current?.open();
-          }}
-        >
-          <DatePicker precision="minute">
-            {(value) =>
-              value ? dayjs(value).format("YYYY-MM-DD hh:mm") : "请选择时间"
-            }
-          </DatePicker>
-        </Form.Item>
-        <Form.Item
-          label={item.timecategory === "backclock" ? "截止时间" : "结束时间"}
-          name="endtime"
-          hidden={item.timecategory === "noclock"}
-          trigger="onConfirm"
-          onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
-            datePickerRef.current?.open();
-          }}
-        >
-          <DatePicker precision="minute">
-            {(value) =>
-              value ? dayjs(value).format("YYYY-MM-DD hh:mm") : "请选择时间"
-            }
-          </DatePicker>
-        </Form.Item>
+        {item.timecategory === "normalclock" ? (
+          <Form.Item
+            label="起始时间"
+            name="starttime"
+            hidden={item.timecategory !== "normalclock"}
+            trigger="onConfirm"
+            required
+            onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
+              datePickerRef.current?.open();
+            }}
+          >
+            <DatePicker precision="minute">
+              {(value) =>
+                value ? dayjs(value).format("YYYY-MM-DD hh:mm") : "请选择时间"
+              }
+            </DatePicker>
+          </Form.Item>
+        ) : null}
+        {item.timecategory !== "noclock" ? (
+          <Form.Item
+            label={item.timecategory === "backclock" ? "截止时间" : "结束时间"}
+            name="endtime"
+            trigger="onConfirm"
+            required
+            onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
+              datePickerRef.current?.open();
+            }}
+          >
+            <DatePicker precision="minute">
+              {(value) =>
+                value ? dayjs(value).format("YYYY-MM-DD hh:mm") : "请选择时间"
+              }
+            </DatePicker>
+          </Form.Item>
+        ) : null}
         <Form.Item label="详细描述" name="detail">
           <TextArea maxLength={100} rows={2} showCount />
         </Form.Item>

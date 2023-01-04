@@ -100,7 +100,7 @@ export default function TabbarRouter() {
       <div className={"tabbar-body"}>
         <Routes>
           {Object.keys(routeInfo).map((key) => (
-            <Route path={key} element={routeInfo[key].element} />
+            <Route key={key} path={key} element={routeInfo[key].element} />
           ))}
           <Route path="*" element={<Navigate to={"/home"} />} />
         </Routes>

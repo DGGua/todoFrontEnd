@@ -1,19 +1,18 @@
 import { Button, Form, Input, Modal } from "antd-mobile";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../scss/login.scss";
-import {userService} from "../../service/userService";
+import { userService } from "../../service/userService";
 export default function Login() {
+  const navigate = useNavigate();
   function handleLogin(id: string, password: string) {
-    userService.login(id,password)
-        .then(response =>{
-          //成功
-          if(response.data.msg === "200"){
-
-          }
-          else {
-
-          }
-        })
+    userService.login(id, password).then((response) => {
+      if (response.data.msg === "成功") {
+        navigate("/home");
+      } else {
+        const modal = Modal.show({ content: response.data.msg });
+        setTimeout(modal.close, 1000);
+      }
+    });
   }
   return (
     <div className="page page-login">
@@ -26,10 +25,18 @@ export default function Login() {
             handleLogin(val.id, val.password)
           }
         >
-          <Form.Item label="账号" name="id">
+          <Form.Item
+            label="账号"
+            name="id"
+            rules={[{ required: true, message: "账号不能为空" }]}
+          >
             <Input placeholder="请输入" />
           </Form.Item>
-          <Form.Item label="密码" name="password">
+          <Form.Item
+            label="密码"
+            name="password"
+            rules={[{ required: true, message: "请输入密码" }]}
+          >
             <Input placeholder="请输入" type="password" />
           </Form.Item>
           <Link to={"/register"} className="link-to-register">

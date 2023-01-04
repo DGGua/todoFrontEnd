@@ -1,4 +1,4 @@
-import { DatePicker, Button, Dialog } from "antd-mobile";
+import { DatePicker, Button, Dialog, Modal, Card } from "antd-mobile";
 import {
   PlusOutlined,
   EditOutlined,
@@ -7,66 +7,67 @@ import {
 } from "@ant-design/icons";
 import { List } from "antd-mobile";
 import { useEffect, useState } from "react";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import "../scss/home.scss";
 import { useNavigate } from "react-router-dom";
-import { Item } from "../../model/item";
+import { convertItem, Item } from "../../model/item";
 import { itemService } from "../../service/itemService";
+import { CheckOutline } from "antd-mobile-icons";
+
+function getTimeStr(item: Item) {
+  switch (item.timecategory) {
+    case "backclock":
+      return `截止时间：${dayjs(item.endtime).format("MM-DD HH:mm")}`;
+    case "normalclock":
+      return `开始时间：${dayjs(item.starttime).format(
+        "MM-DD HH:mm"
+      )} 结束时间：${dayjs(item.endtime).format("MM-DD HH:mm")}`;
+    default:
+      return "";
+  }
+}
 
 export default function Home() {
   const [pickerVisible, setPickerVisible] = useState(false);
-  const [date, setdate] = useState(dayjs.default());
-  const [chosenItem, setChosenItem] = useState<Item>();
+  const [date, setdate] = useState(dayjs());
   const [itemList, setItemList] = useState<Item[]>([]);
   const navigate = useNavigate();
-  var empty: Item;
 
   useEffect(() => {
     itemService
-      .list(date.format("YYYYMMDD"))
-      .then((res) => setItemList(res.data.data));
+      .list(date.format("YYYY-MM-DD"))
+      .then((res) => setItemList(res.data.data.map(convertItem)));
   }, [date]);
-  useEffect(() => {
-    console.log(itemList);
-  }, [itemList]);
 
-  function goEdit() {
-    if (!chosenItem) {
-      Dialog.alert({
-        content: '请选择需要修改的项目！',
-        onConfirm: () => {
-          console.log('Confirmed')
-        }
-      })
-      return;
-    }
-    navigate("/edit", { state: { item: chosenItem } });
+  function goEdit(item: Item) {
+    navigate("/edit", { state: { item } });
   }
   function goAdd() {
-    navigate("/edit", { state: { item: chosenItem } });
+    navigate("/edit");
   }
-  function goDelete(){
-    if (!chosenItem){
-      Dialog.alert({
-        content: '请选择需要删除的项目！',
-        onConfirm: () => {
-          console.log('Confirmed')
-        }
-      })
-      return;
-    }
+  function goDelete(item: Item) {
     Dialog.confirm({
-      content: '确认要删除吗？',
-      onConfirm:()=>{
-        itemService.delete(chosenItem.id);
+      content: "确认要删除吗？",
+      onConfirm: async () => {
+        await itemService.delete(item.id);
         itemService
-            .list(date.format("YYYYMMDD"))
-            .then((res) => setItemList(res.data.data));
-        setChosenItem(empty);
-      }
-    })
+          .list(date.format("YYYYMMDD"))
+          .then((res) => setItemList(res.data.data.map(convertItem)));
+      },
+    });
   }
-
+  function goComplete(item: Item) {
+    Dialog.confirm({
+      content: "确认当前待办已完成？",
+      onConfirm: async () => {
+        await itemService.complete(item.id);
+        itemService
+          .list(date.format("YYYYMMDD"))
+          .then((res) => setItemList(res.data.data.map(convertItem)));
+      },
+    });
+  }
+  console.log(itemList);
   return (
     <div className="page page-main">
       <Button onClick={() => setPickerVisible(true)}>
@@ -76,35 +77,39 @@ export default function Home() {
       <DatePicker
         visible={pickerVisible}
         onConfirm={(val) => {
-          setdate(dayjs.default(val));
+          setdate(dayjs(val));
           setPickerVisible(false);
         }}
       />
       <div className="todolist">
         <div className="title">
           <div>待办事件表</div>
-          <div className="icons">
-            <PlusOutlined onClick={goAdd} />
-            <EditOutlined onClick={goEdit} />
-            <DeleteOutlined onClick={goDelete}/>
-          </div>
+          <PlusOutlined onClick={goAdd} />
         </div>
-        <List className="content">
+        <div className="content">
           {itemList.map((item) => (
-            <>
-              <List.Item key={item.id} onClick={() => setChosenItem(item)}>
-                {item.name}
-              </List.Item>
-              {item.category === "group"
-                ? item.subs.map((sub, index) => (
-                    <List.Item key={index} className="item-sub">
+            <Card>
+              <div className="title">{item.name}</div>
+              <div className="timeinfo">{getTimeStr(item)}</div>
+
+              {item.category === "group" ? (
+                <div className="subs">
+                  {item.subs.map((sub) => (
+                    <div className="sub">
+                      <b>●</b>
                       {sub}
-                    </List.Item>
-                  ))
-                : null}
-            </>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              <div className="footer">
+                <CheckOutline onClick={() => goComplete(item)} />
+                <EditOutlined onClick={() => goEdit(item)} />
+                <DeleteOutlined onClick={() => goDelete(item)} />
+              </div>
+            </Card>
           ))}
-        </List>
+        </div>
       </div>
     </div>
   );
