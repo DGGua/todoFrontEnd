@@ -2,10 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import "antd/dist/reset.css";
 import "dayjs/locale/zh-cn";
-import zhCN from "antd/locale/zh_CN";
-import { ConfigProvider } from "antd";
 import TabbarRouter from "./router";
 import { BrowserRouter } from "react-router-dom";
 
@@ -15,11 +12,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <ConfigProvider locale={zhCN}>
-      <BrowserRouter>
-        <TabbarRouter />
-      </BrowserRouter>
-    </ConfigProvider>
+    <BrowserRouter>
+      <TabbarRouter />
+    </BrowserRouter>
   </React.StrictMode>
 );
 

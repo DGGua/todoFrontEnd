@@ -5,7 +5,9 @@ import {
   Form,
   Input,
   JumboTabs,
+  Modal,
   Radio,
+  Space,
   TextArea,
 } from "antd-mobile";
 import {
@@ -16,10 +18,20 @@ import {
   PlayOutline,
 } from "antd-mobile-icons";
 import dayjs from "dayjs";
-import { RefObject, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-
-interface Item {}
+import { RefObject, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import "../scss/edit.scss";
+import { itemService } from "../../service/itemService";
+import {
+  Item,
+  defaultRawItem,
+  RawItem,
+  convertItem,
+  ItemUnconverted,
+  unconvertItem,
+  ResTemp,
+} from "../../model/item";
+import { AxiosResponse } from "axios";
 
 const itemTypes = [
   {
@@ -35,26 +47,51 @@ const itemTypes = [
 export default function Edit() {
   const { state } = useLocation();
   const [clockType, setClockType] = useState("backclock");
-  const [values, setValues] = useState<any>({});
-  const item: Item = state.item;
-
-  useEffect(() => {
-    console.log(values);
-  }, [values]);
-
+  const [item, setItem] = useState<Item | RawItem>(
+    state?.item === undefined
+      ? defaultRawItem
+      : convertItem(state.item as ItemUnconverted)
+  );
+  const mode = state?.item === undefined ? "新建" : "编辑";
+  const navigate = useNavigate();
+  function handleSubmit() {
+    let promise: Promise<AxiosResponse<ResTemp>>;
+    if (mode === "新建") {
+      promise = itemService.create(
+        unconvertItem({ ...item, id: dayjs().valueOf() })
+      );
+    } else {
+      promise = itemService.update(unconvertItem(item) as ItemUnconverted);
+    }
+    promise.then((res) => {
+      const modal = Modal.show({ content: res.data.msg });
+      setTimeout(() => {
+        modal.close();
+        if (res.data.code === 0) navigate("/home");
+      }, 1000);
+    });
+  }
   return (
     <div className="page editpage">
-      {item ? "编辑待办" : "添加待办"}
+      <div className="title">{`${mode}待办`}</div>
       <Form
-        initialValues={values}
+        initialValues={item}
         layout="horizontal"
-        onValuesChange={(_, values) => setValues(values)}
+        onValuesChange={(_, values) => {
+          setItem(values);
+        }}
+        onFinish={handleSubmit}
         footer={
           <div className="form-footer">
-            <Button color="primary" size="large">
+            <Button type="submit" color="primary" size="large" block>
               确认
             </Button>
-            <Button color="default" size="large" onClick={() => {}}>
+            <Button
+              color="default"
+              size="large"
+              block
+              onClick={() => navigate(-1)}
+            >
               取消
             </Button>
           </div>
@@ -62,21 +99,25 @@ export default function Edit() {
       >
         <Form.Item
           label="待办名称"
-          name="content"
+          name="name"
           rules={[{ required: true, message: "名称不能为空" }]}
         >
           <Input placeholder="请输入" />
         </Form.Item>
         <Form.Item label="待办类型" name="category" required>
           <Radio.Group defaultValue="single">
-            {itemTypes.map((item) => (
-              <Radio value={item.value}>{item.label}</Radio>
-            ))}
+            <Space>
+              {itemTypes.map((item, index) => (
+                <Radio key={index} value={item.value}>
+                  {item.label}
+                </Radio>
+              ))}
+            </Space>
           </Radio.Group>
         </Form.Item>
-        {values.category === "group" ? (
+        {item.category === "group" ? (
           <Form.Array
-            name="contacts"
+            name="subs"
             onAdd={(operation) => operation.add({ listitem: "" })}
             renderAdd={() => (
               <span>
@@ -102,7 +143,7 @@ export default function Edit() {
             }
           </Form.Array>
         ) : null}
-        <Form.Item label="计时类型" name="timecategory">
+        <Form.Item label="计时类型" name="timecategory" required>
           <JumboTabs activeKey={clockType} onChange={setClockType}>
             <JumboTabs.Tab
               title={<ClockCircleOutline />}
@@ -121,36 +162,41 @@ export default function Edit() {
             ></JumboTabs.Tab>
           </JumboTabs>
         </Form.Item>
-        <Form.Item
-          label="起始时间"
-          name="endtime"
-          hidden={values.timecategory !== "normalclock"}
-          trigger="onConfirm"
-          onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
-            datePickerRef.current?.open();
-          }}
-        >
-          <DatePicker precision="minute">
-            {(value) =>
-              value ? dayjs(value).format("YYYY-MM-DD hh:mm") : "请选择时间"
-            }
-          </DatePicker>
-        </Form.Item>
-        <Form.Item
-          label={values.timecategory === "backclock" ? "截止时间" : "结束时间"}
-          name="endtime"
-          hidden={values.timecategory === "noclock"}
-          trigger="onConfirm"
-          onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
-            datePickerRef.current?.open();
-          }}
-        >
-          <DatePicker precision="minute">
-            {(value) =>
-              value ? dayjs(value).format("YYYY-MM-DD hh:mm") : "请选择时间"
-            }
-          </DatePicker>
-        </Form.Item>
+        {item.timecategory === "normalclock" ? (
+          <Form.Item
+            label="起始时间"
+            name="starttime"
+            hidden={item.timecategory !== "normalclock"}
+            trigger="onConfirm"
+            required
+            onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
+              datePickerRef.current?.open();
+            }}
+          >
+            <DatePicker precision="minute">
+              {(value) =>
+                value ? dayjs(value).format("YYYY-MM-DD hh:mm") : "请选择时间"
+              }
+            </DatePicker>
+          </Form.Item>
+        ) : null}
+        {item.timecategory !== "noclock" ? (
+          <Form.Item
+            label={item.timecategory === "backclock" ? "截止时间" : "结束时间"}
+            name="endtime"
+            trigger="onConfirm"
+            required
+            onClick={(e, datePickerRef: RefObject<DatePickerRef>) => {
+              datePickerRef.current?.open();
+            }}
+          >
+            <DatePicker precision="minute">
+              {(value) =>
+                value ? dayjs(value).format("YYYY-MM-DD hh:mm") : "请选择时间"
+              }
+            </DatePicker>
+          </Form.Item>
+        ) : null}
         <Form.Item label="详细描述" name="detail">
           <TextArea maxLength={100} rows={2} showCount />
         </Form.Item>

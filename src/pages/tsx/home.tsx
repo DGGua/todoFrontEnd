@@ -1,39 +1,72 @@
-import { DatePicker, Button } from "antd-mobile";
+import { DatePicker, Button, Dialog, Card } from "antd-mobile";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
-import { List } from "antd-mobile";
-import { useState } from "react";
-import * as dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 import "../scss/home.scss";
 import { useNavigate } from "react-router-dom";
+import { convertItem, Item } from "../../model/item";
+import { itemService } from "../../service/itemService";
+import { CheckOutline } from "antd-mobile-icons";
 
-const data = [
-  "Racing car sprays burning fuel into crowd.",
-  "Japanese princess to wed commoner.",
-  "Australian walks 100km after outback crash.",
-  "Man charged over missing wedding girl.",
-  "Los Angeles battles huge wildfires.",
-];
-
-interface Item {}
+function getTimeStr(item: Item) {
+  switch (item.timecategory) {
+    case "backclock":
+      return `截止时间：${dayjs(item.endtime).format("MM-DD HH:mm")}`;
+    case "normalclock":
+      return `开始时间：${dayjs(item.starttime).format(
+        "MM-DD HH:mm"
+      )} 结束时间：${dayjs(item.endtime).format("MM-DD HH:mm")}`;
+    default:
+      return "";
+  }
+}
 
 export default function Home() {
   const [pickerVisible, setPickerVisible] = useState(false);
-  const [date, setdate] = useState(dayjs.default());
-  const [chosenItem, setChosenItem] = useState<Item>();
+  const [date, setdate] = useState(dayjs());
+  const [itemList, setItemList] = useState<Item[]>([]);
   const navigate = useNavigate();
-  function goEdit() {
-    if (!!!chosenItem) return;
-    navigate("/edit", { state: { item: chosenItem } });
+
+  useEffect(() => {
+    itemService
+      .list(date.format("YYYY-MM-DD"))
+      .then((res) => setItemList(res.data.data.map(convertItem)));
+  }, [date]);
+
+  function goEdit(item: Item) {
+    navigate("/edit", { state: { item } });
   }
   function goAdd() {
-    navigate("/edit", { state: { item: chosenItem } });
+    navigate("/edit");
   }
-
+  function goDelete(item: Item) {
+    Dialog.confirm({
+      content: "确认要删除吗？",
+      onConfirm: async () => {
+        await itemService.delete(item.id);
+        itemService
+          .list(date.format("YYYYMMDD"))
+          .then((res) => setItemList(res.data.data.map(convertItem)));
+      },
+    });
+  }
+  function goComplete(item: Item) {
+    Dialog.confirm({
+      content: "确认当前待办已完成？",
+      onConfirm: async () => {
+        await itemService.complete(item.id);
+        itemService
+          .list(date.format("YYYYMMDD"))
+          .then((res) => setItemList(res.data.data.map(convertItem)));
+      },
+    });
+  }
+  console.log(itemList);
   return (
     <div className="page page-main">
       <Button onClick={() => setPickerVisible(true)}>
@@ -43,24 +76,39 @@ export default function Home() {
       <DatePicker
         visible={pickerVisible}
         onConfirm={(val) => {
-          setdate(dayjs.default(val));
+          setdate(dayjs(val));
           setPickerVisible(false);
         }}
       />
       <div className="todolist">
         <div className="title">
           <div>待办事件表</div>
-          <div className="icons">
-            <PlusOutlined onClick={goAdd} />
-            <EditOutlined onClick={goEdit} />
-            <DeleteOutlined />
-          </div>
+          <PlusOutlined onClick={goAdd} />
         </div>
-        <List className="content">
-          {data.map((item) => (
-            <List.Item onClick={() => setChosenItem(item)}>{item}</List.Item>
+        <div className="content">
+          {itemList.map((item) => (
+            <Card>
+              <div className="title">{item.name}</div>
+              <div className="timeinfo">{getTimeStr(item)}</div>
+
+              {item.category === "group" ? (
+                <div className="subs">
+                  {item.subs.map((sub) => (
+                    <div className="sub">
+                      <b>●</b>
+                      {sub}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              <div className="footer">
+                <CheckOutline onClick={() => goComplete(item)} />
+                <EditOutlined onClick={() => goEdit(item)} />
+                <DeleteOutlined onClick={() => goDelete(item)} />
+              </div>
+            </Card>
           ))}
-        </List>
+        </div>
       </div>
     </div>
   );

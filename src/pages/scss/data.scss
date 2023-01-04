@@ -1,4 +1,7 @@
 .page-data {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   .card-body {
     display: flex;
     width: 100%;
@@ -7,6 +10,13 @@
       text-align: center;
       font-size: large;
     }
+    .card-item-title {
+      margin-top: 0.5rem;
+    }
 
+    .card-item-data {
+      margin-top: 0.5rem;
+      font-size: x-large;
+    }
   }
 }
