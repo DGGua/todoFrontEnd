@@ -1,4 +1,4 @@
-import { Card, Space } from "antd-mobile";
+import { Card } from "antd-mobile";
 import { useEffect, useState } from "react";
 import { AnalType, dataService, InfoPair } from "../../service/dataService";
 import "../scss/data.scss";

@@ -1,11 +1,10 @@
-import { DatePicker, Button, Dialog, Modal, Card } from "antd-mobile";
+import { DatePicker, Button, Dialog, Card } from "antd-mobile";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
-import { List } from "antd-mobile";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "../scss/home.scss";
