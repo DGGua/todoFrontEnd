@@ -88,13 +88,15 @@ export default function TabbarRouter() {
     <div className="tabbar-app">
       <div
         className="tabbar-top"
-        style={{ display: routeInfo[pathname].title ? "block" : "none" }}
+        style={{
+          display: routeInfo[pathname]?.title ? "block" : "none",
+        }}
       >
         <NavBar
-          back={routeInfo[pathname].backward ? "" : null}
+          back={routeInfo[pathname]?.backward ? "" : null}
           onBack={() => navigate(-1)}
         >
-          {routeInfo[pathname].title}
+          {routeInfo[pathname]?.title || ""}
         </NavBar>
       </div>
       <div className={"tabbar-body"}>
@@ -107,7 +109,7 @@ export default function TabbarRouter() {
       </div>
       <div
         className={"tabbar-bottom"}
-        style={{ display: routeInfo[pathname].bar ? "block" : "none" }}
+        style={{ display: routeInfo[pathname]?.bar ? "block" : "none" }}
       >
         <Bottom />
       </div>
