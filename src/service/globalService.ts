@@ -2,7 +2,8 @@ import axios from "axios";
 
 export const localAxios = axios.create({
   //   baseURL: "https://mock.apifox.cn/m1/2145942-0-default",
-  baseURL: "http://39.106.92.255:8080",
+  baseURL: "http://todo.dggua.top/api",
+  // baseURL: "http://192.168.1.101:8080",
   withCredentials: true,
 });
 
