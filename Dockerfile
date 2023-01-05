@@ -1,7 +1,10 @@
 FROM node:16
-COPY ./ /app
 WORKDIR /app
-RUN npm i -g pnpm && pnpm install && pnpm build
+COPY pnpm-lock.yaml /app
+COPY package.json /app
+RUN npm i -g pnpm && pnpm install
+COPY ./ /app
+RUN pnpm build
 
 FROM nginx
 RUN mkdir /app
