@@ -49,9 +49,6 @@ export default function Login() {
         <Link to={"/register"} className="link-to-register">
           没有账号？点击注册
         </Link>
-        <Link to={"/home"} className="link-to-register">
-          临时入口，直接进去
-        </Link>
         <Button block color="primary" size="large" onClick={handleLogin}>
           登录
         </Button>
