@@ -58,7 +58,7 @@ export default function Edit() {
     let promise: Promise<AxiosResponse<ResTemp>>;
     if (mode === "新建") {
       promise = itemService.create(
-        unconvertItem({ ...item, id: dayjs().valueOf() })
+        unconvertItem({ ...item, id: dayjs().valueOf() % 2147483647 })
       );
     } else {
       promise = itemService.update(unconvertItem(item) as ItemUnconverted);
@@ -67,7 +67,7 @@ export default function Edit() {
       const modal = Modal.show({ content: res.data.msg });
       setTimeout(() => {
         modal.close();
-        if (res.data.code === 0) navigate("/home");
+        if (res.data.code === 1) navigate("/home");
       }, 1000);
     });
   }
