@@ -1,5 +1,4 @@
-import axios, { AxiosResponse } from "axios";
-import { ResTemp } from "../model/item";
+import axios from "axios";
 
 export const localAxios = axios.create({
   //   baseURL: "https://mock.apifox.cn/m1/2145942-0-default",
