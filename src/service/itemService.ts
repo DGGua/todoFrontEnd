@@ -15,5 +15,5 @@ export const itemService = {
   delete: (id: number) =>
     localAxios.delete<ResTemp>("/todo/delete", { params: { id } }),
   complete: (id: number) =>
-    localAxios.post<ResTemp>("/todo/complete", { params: { id } }),
+    localAxios.post<ResTemp>("/todo/complete", null, { params: { id } }),
 };

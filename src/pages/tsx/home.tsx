@@ -34,10 +34,10 @@ export default function Home() {
 
   useEffect(() => {
     itemService
-      .list(date.format("YYYY-MM-DD"))
+      .list(date.format("YYYYMMDD"))
       .then((res) => setItemList(res.data.data.map(convertItem)));
   }, [date]);
-
+  
   function goEdit(item: Item) {
     navigate("/edit", { state: { item } });
   }
@@ -66,7 +66,6 @@ export default function Home() {
       },
     });
   }
-  console.log(itemList);
   return (
     <div className="page page-main">
       <Button onClick={() => setPickerVisible(true)}>
