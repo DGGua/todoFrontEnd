@@ -6,11 +6,18 @@
   .panel-login {
     display: flex;
     align-items: center;
+    padding: 20px 12px;
     justify-content: center;
     flex-direction: column;
     border: 2px solid var(--adm-border-color);
     border-radius: var(--adm-radius-m);
     margin: 1rem;
+    .adm-card {
+      padding: unset;
+      .adm-card-body {
+        padding: unset;
+      }
+    }
     h1 {
       margin-top: 1rem;
     }
