@@ -66,7 +66,6 @@ export default function Home() {
       },
     });
   }
-  console.log(itemList);
   return (
     <div className="page page-main">
       <Button onClick={() => setPickerVisible(true)}>
