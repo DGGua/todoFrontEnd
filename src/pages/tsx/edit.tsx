@@ -71,13 +71,25 @@ export default function Edit() {
       }, 1000);
     });
   }
+  function convertItemToDisplay(item: Item | RawItem) {
+    if (item.category === "single") return item;
+    const ret: any = item;
+    ret.subs = item.subs.map((s) => {
+      return { listitem: s };
+    });
+    return ret;
+  }
+
   return (
     <div className="page editpage">
       <div className="title">{`${mode}待办`}</div>
       <Form
-        initialValues={item}
+        initialValues={convertItemToDisplay(item)}
         layout="horizontal"
         onValuesChange={(_, values) => {
+          values.subs = values.subs
+            .map((obj: { listitem: string }) => obj.listitem)
+            .filter((value: string) => value);
           setItem(values);
         }}
         onFinish={handleSubmit}
