@@ -73,7 +73,7 @@ export default function Edit() {
   }
   function convertItemToDisplay(item: Item | RawItem) {
     if (item.category === "single") return item;
-    const ret: any = item;
+    const ret: any = Object.assign({}, item);
     ret.subs = item.subs.map((s) => {
       return { listitem: s };
     });
@@ -87,13 +87,12 @@ export default function Edit() {
         initialValues={convertItemToDisplay(item)}
         layout="horizontal"
         onValuesChange={(_, values) => {
-          setItem({
-            ...values,
-            subs:
-              values.subs
-                ?.map((obj: { listitem: string }) => obj.listitem)
-                .filter((value: string) => value) || [],
-          });
+          let end: any = Object.assign({}, values);
+          end.subs =
+            values.subs
+              ?.map((obj: { listitem: string }) => obj.listitem)
+              .filter((value: string) => value) || [];
+          setItem(end);
         }}
         onFinish={handleSubmit}
         footer={
