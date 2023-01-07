@@ -87,10 +87,13 @@ export default function Edit() {
         initialValues={convertItemToDisplay(item)}
         layout="horizontal"
         onValuesChange={(_, values) => {
-          values.subs = values.subs
-            .map((obj: { listitem: string }) => obj.listitem)
-            .filter((value: string) => value);
-          setItem(values);
+          setItem({
+            ...values,
+            subs:
+              values.subs
+                ?.map((obj: { listitem: string }) => obj.listitem)
+                .filter((value: string) => value) || [],
+          });
         }}
         onFinish={handleSubmit}
         footer={
